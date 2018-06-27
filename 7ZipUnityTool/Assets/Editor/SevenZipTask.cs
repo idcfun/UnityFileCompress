@@ -26,7 +26,15 @@ public class SevenZipTask {
 
         string inputPath = inputPaths[0];
         int index = inputPath.LastIndexOf('.');
-        outputPath = inputPath.Substring(0, index) + ".zip";
+        if (index != -1)
+        {
+            outputPath = inputPath.Substring(0, index) + ".zip";
+        }
+        else
+        {
+            outputPath = inputPath + ".zip";
+        }
+
         FileStream output = new FileStream(outputPath, FileMode.Create);
 
         //Write the encoder properties

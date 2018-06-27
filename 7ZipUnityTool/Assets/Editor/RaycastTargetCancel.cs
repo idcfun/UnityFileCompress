@@ -6,7 +6,7 @@ using System.IO;
 using UnityEngine.UI;
 public class RaycastTargetCancel : MonoBehaviour {
     
-    [MenuItem("UITools/Raycast Target Cancel")]
+    [MenuItem("Tools/Cancel All Raycast Target")]
     public static void CancelRaycastTarget()
     {
         Debug.Log(Application.persistentDataPath);
