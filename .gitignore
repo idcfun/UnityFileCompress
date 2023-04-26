@@ -1,0 +1,8 @@
+.DS_Store
+*.csproj
+7ZipUnityTool/.vscode/settings.json
+*.sln
+7ZipUnityTool/Library/
+7ZipUnityTool/Temp/
+7ZipUnityTool/Assets/.DS_Store
+7ZipUnityTool/obj/

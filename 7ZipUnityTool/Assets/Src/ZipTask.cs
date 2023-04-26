@@ -1,9 +1,11 @@
-﻿using System;
+﻿using System.Text;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using UnityEngine;
+using SevenZip.Compression;
+using SevenZip;
 
 public class ZipTask {
 
@@ -14,16 +16,21 @@ public class ZipTask {
         task.Compress(url, inputPaths, outputPath);
     }
 
-    public static void StartDecompress(string decompressfile)
+    public static void StartDecompress(string decompressfile,string outputPath, Action uncompressSuccess = null)
     {
         ZipTask task = new ZipTask();
-        task.Decompress(decompressfile);
+        task.Decompress(decompressfile, outputPath);
     }
 
     private void Compress(string url, string[] inputPaths, string outputPath)
     {
         SevenZip.Compression.LZMA.Encoder coder = new SevenZip.Compression.LZMA.Encoder();
-        FileStream output = new FileStream(outputPath, FileMode.Create);
+        string outputDir = Path.GetDirectoryName(outputPath);
+        if(!Directory.Exists( outputDir )){
+            Directory.CreateDirectory(outputDir);
+        }
+
+        FileStream output = new FileStream(outputPath, FileMode.OpenOrCreate);
         //Write the encoder properties
         coder.WriteCoderProperties(output);
         FileStream input;
@@ -37,10 +44,9 @@ public class ZipTask {
             long inputStreamLen = input.Length;
 
             ///Write the file name 
-            string filename = path.Substring(url.Length+1, path.Length-url.Length-1);
-            Debug.Log(filename);
+            string filename = Path.GetFileName(path);
 
-            byte[] nameBytes = Encoding.Default.GetBytes(filename);
+            byte[] nameBytes = System.Text.Encoding.Default.GetBytes(filename);
             output.Write(BitConverter.GetBytes(nameBytes.Length), 0, 4);
             output.Write(nameBytes, 0, nameBytes.Length);
 
@@ -56,9 +62,10 @@ public class ZipTask {
         }
 
         output.Close();
+
     }
 
-    private void Decompress(string inputPath)
+    private void Decompress(string inputPath, string outputDir)
     {
         SevenZip.Compression.LZMA.Decoder coder = new SevenZip.Compression.LZMA.Decoder();
         FileStream input = new FileStream(inputPath, FileMode.Open);
@@ -79,8 +86,8 @@ public class ZipTask {
             int nameLength = BitConverter.ToInt32(bytes, 0);
             bytes = new byte[nameLength];
             input.Read(bytes, 0, nameLength);
-            string name = Encoding.Default.GetString(bytes);
-            string dir = Application.streamingAssetsPath + "/"+Path.GetDirectoryName(name);
+            string name = System.Text.Encoding.Default.GetString(bytes);
+            string dir = outputDir + "/"+Path.GetDirectoryName(name);
 
             if(!Directory.Exists(dir))
             {
